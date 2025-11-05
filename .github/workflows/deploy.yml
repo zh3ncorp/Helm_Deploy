@@ -1,0 +1,12 @@
+name: Deploy Online Boutique
+
+on:
+  push:
+    branches: [ release ]   # Запускать при пуше в release
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say hello
+        run: echo "Hello from GitHub Actions!"
