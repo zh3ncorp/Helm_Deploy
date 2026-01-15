@@ -41,7 +41,7 @@ jobs:
 
     # 6️⃣ Обновляем зависимости Helm (если есть)
     - name: Helm dependency update
-      run: helm dependency update ./charts
+      run: helm dependency update .
 
     # 7️⃣ Деплоим Online Boutique
     - name: Deploy Online Boutique
