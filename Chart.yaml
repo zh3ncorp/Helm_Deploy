@@ -1,0 +1,26 @@
+apiVersion: v2
+name: online-boutique
+description: Minimal Online Boutique Helm Chart
+type: application
+version: 0.1.0
+
+dependencies:
+  - name: frontend
+    version: 0.1.0
+    repository: "file://charts/frontend"
+
+  - name: productcatalogservice
+    version: 0.1.0
+    repository: "file://charts/productcatalogservice"
+
+  - name: cartservice
+    version: 0.1.0
+    repository: "file://charts/cartservice"
+
+  - name: redis-cart
+    version: 0.1.0
+    repository: "file://charts/redis-cart"
+
+  - name: currencyservice
+    version: 0.1.0
+    repository: "file://charts/currencyservice"

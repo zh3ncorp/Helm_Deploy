@@ -1,0 +1,18 @@
+dependencies:
+- name: frontend
+  repository: file://charts/frontend
+  version: 0.1.0
+- name: productcatalogservice
+  repository: file://charts/productcatalogservice
+  version: 0.1.0
+- name: cartservice
+  repository: file://charts/cartservice
+  version: 0.1.0
+- name: redis-cart
+  repository: file://charts/redis-cart
+  version: 0.1.0
+- name: currencyservice
+  repository: file://charts/currencyservice
+  version: 0.1.0
+digest: sha256:bdf64065a4a9a880740e33e91d67fc51f43c8f422d34d94605d03228577a713f
+generated: "2025-12-25T11:12:28.7414769+03:00"

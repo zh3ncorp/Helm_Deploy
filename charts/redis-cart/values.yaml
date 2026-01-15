@@ -1,0 +1,11 @@
+replicaCount: 1
+
+image:
+  repository: redis
+  tag: alpine
+
+containerPort: 6379
+
+service:
+  type: ClusterIP
+  port: 6379
