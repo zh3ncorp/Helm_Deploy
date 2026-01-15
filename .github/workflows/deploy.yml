@@ -65,3 +65,12 @@ jobs:
           --all \
           -n boutique \
           --timeout=300s
+    - name: Smoke test frontend
+      run: |
+        kubectl run curl \
+          -n boutique \
+          --image=curlimages/curl \
+          --restart=Never \
+          --rm -i \
+          --command -- \
+          curl -sSf http://frontend
