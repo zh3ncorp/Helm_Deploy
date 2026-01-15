@@ -1,12 +1,66 @@
-name: Deploy Online Boutique
+name: Deploy Online Boutique with Helm
 
 on:
   push:
-    branches: [ release ]   # Запускать при пуше в release
+    branches:
+      - main
 
 jobs:
-  hello:
+  deploy:
+    name: Helm deploy to KIND
     runs-on: ubuntu-latest
+
     steps:
-      - name: Say hello
-        run: echo "Hello from GitHub Actions!"
+    # 1️⃣ Забираем код
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 2️⃣ Поднимаем Kubernetes (KIND)
+    - name: Create KIND cluster
+      uses: helm/kind-action@v1.8.0
+      with:
+        cluster_name: boutique
+
+    # 3️⃣ Устанавливаем kubectl
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: v1.28.0
+
+    # 4️⃣ Устанавливаем Helm
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.13.0
+
+    # 5️⃣ Проверяем, что кластер жив
+    - name: Kubernetes cluster info
+      run: |
+        kubectl cluster-info
+        kubectl get nodes
+
+    # 6️⃣ Обновляем зависимости Helm (если есть)
+    - name: Helm dependency update
+      run: helm dependency update ./charts
+
+    # 7️⃣ Деплоим Online Boutique
+    - name: Deploy Online Boutique
+      run: |
+        helm upgrade --install boutique ./charts \
+          --namespace boutique \
+          --create-namespace \
+          --wait \
+          --timeout 5m
+
+    # 8️⃣ Проверяем pod’ы
+    - name: Check pods
+      run: kubectl get pods -n boutique
+
+    # 9️⃣ Ждём, пока всё станет Ready
+    - name: Wait for all pods to be ready
+      run: |
+        kubectl wait \
+          --for=condition=Ready pod \
+          --all \
+          -n boutique \
+          --timeout=300s
