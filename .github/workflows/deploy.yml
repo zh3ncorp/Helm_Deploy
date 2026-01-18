@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/test-1
 
 jobs:
   deploy:
@@ -46,7 +47,7 @@ jobs:
     # 7️⃣ Деплоим Online Boutique
     - name: Deploy Online Boutique
       run: |
-        helm upgrade --install boutique ./charts \
+        helm upgrade --install boutique . \
           --namespace boutique \
           --create-namespace \
           --wait \
@@ -64,3 +65,12 @@ jobs:
           --all \
           -n boutique \
           --timeout=300s
+    - name: Smoke test frontend
+      run: |
+        kubectl run curl \
+          -n boutique \
+          --image=curlimages/curl \
+          --restart=Never \
+          --rm -i \
+          --command -- \
+          curl -sSf http://frontend
