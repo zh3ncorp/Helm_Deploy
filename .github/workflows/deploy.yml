@@ -1,4 +1,4 @@
-name: Deploy Online Boutique with Helm
+name: Deploy App with Helm
 
 on:
   push:
@@ -12,40 +12,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1️⃣ Забираем код
+    #Забираем код
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 2️⃣ Поднимаем Kubernetes (KIND)
     - name: Create KIND cluster
       uses: helm/kind-action@v1.8.0
       with:
         cluster_name: boutique
 
-    # 3️⃣ Устанавливаем kubectl
     - name: Setup kubectl
       uses: azure/setup-kubectl@v3
       with:
         version: v1.28.0
 
-    # 4️⃣ Устанавливаем Helm
     - name: Setup Helm
       uses: azure/setup-helm@v3
       with:
         version: v3.13.0
 
-    # 5️⃣ Проверяем, что кластер жив
+    #Проверяем доступность кластера
     - name: Kubernetes cluster info
       run: |
         kubectl cluster-info
         kubectl get nodes
 
-    # 6️⃣ Обновляем зависимости Helm (если есть)
+    #Обновляем зависимости Helm
     - name: Helm dependency update
       run: helm dependency update .
 
-    # 7️⃣ Деплоим Online Boutique
-    - name: Deploy Online Boutique
+    #Проверка шаблонов Helm (render + lint)
+    - name: Validate Helm templates
+      run: |
+        helm lint .
+        helm template boutique . > rendered.yaml
+
+    #Развёртывание приложения
+    - name: Deploy App
+      id: deploy
       run: |
         helm upgrade --install boutique . \
           --namespace boutique \
@@ -53,19 +57,26 @@ jobs:
           --wait \
           --timeout 5m
 
-    # 8️⃣ Проверяем pod’ы
-    - name: Check pods
-      run: kubectl get pods -n boutique
-
-    # 9️⃣ Ждём, пока всё станет Ready
-    - name: Wait for all pods to be ready
+    #Проверка pod’ов
+    - name: Check pods readiness
+      id: pods
       run: |
         kubectl wait \
           --for=condition=Ready pod \
           --all \
           -n boutique \
           --timeout=300s
+
+    #Rollback при ошибке
+    - name: Helm rollback on failure
+      if: failure()
+      run: |
+        echo "Deploy failed, performing rollback..."
+        helm rollback boutique
+
+    #Smoke test
     - name: Smoke test frontend
+      if: success()
       run: |
         kubectl run curl \
           -n boutique \
