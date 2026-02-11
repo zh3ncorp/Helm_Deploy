@@ -24,7 +24,3 @@ dependencies:
   - name: currencyservice
     version: 0.1.0
     repository: "file://charts/currencyservice"
-
-  - name: shippingservice
-    version: 0.1.0
-    repository: "file://charts/shippingservice"
