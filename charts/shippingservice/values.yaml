@@ -1,0 +1,6 @@
+shippingservice:
+  image:
+    repository: gcr.io/google-samples/microservices-demo/shippingservice
+    tag: v0.10.0
+  service:
+    port: 50051
